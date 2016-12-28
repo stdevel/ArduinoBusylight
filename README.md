@@ -1,5 +1,5 @@
 # ArduinoBusylight
-`ArduinoBusylight` is a simple, low-budget Arduino-based busylight for Microsoft Lync / Skype for Business. It's easy to build and really makes your desk look uber-nerdy.
+`ArduinoBusylight` is a simple, low-budget Arduino-based busylight for **Microsoft Lync** / **Skype for Business**. It's easy to build and really makes your desk look uber-nerdy.
 This repository includes a C# agent that automatically updates the LED color once your Lync/SfB availability status has changed.
 
 ![Screenshot](https://raw.githubusercontent.com/stdevel/ArduinoBusylight/master/Screenshot.jpg "Screenshot")
