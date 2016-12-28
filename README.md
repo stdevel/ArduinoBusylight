@@ -27,3 +27,6 @@ The installation is quite easy:
 1. Download the Arduino sketch from the `arduino_busylight` folder and flash it to your Arduino
 2. Compile the Windows application from the `ArduinoBusylight` folder (*or download a pre-built release, will follow*)
 3. Start the application, right-click the tray icon and select `Configure`. Configure your COM port and baud rate and click `Save`
+
+# Credits
+Blue LED try icon was taken from [easyicon](https://www.easyicon.net/language.en/1651-ball_blue_led_light_icon.html)
