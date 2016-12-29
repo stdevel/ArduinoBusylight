@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Ports;
 //Skype
 using Microsoft.Lync.Model;
+using Microsoft.Lync.Model.Conversation;
 
 namespace ArduinoBusylight
 {
@@ -63,7 +64,10 @@ namespace ArduinoBusylight
                 lyncClient = LyncClient.GetClient();
                 if (lyncClient.Self.Contact != null)
                 {
+                    //Add event handler for changed availabilities
                     lyncClient.Self.Contact.ContactInformationChanged += Contact_ContactInformationChanged;
+                    //Add event handler for incoming conversations
+                    lyncClient.ConversationManager.ConversationAdded += ConversationManager_ConversationAdded;
                 }
             }
             catch(ClientNotFoundException ex)
@@ -71,14 +75,34 @@ namespace ArduinoBusylight
                 MessageBox.Show("No running Lync or Skype for Business client was found. Your state will not be changed automatically.", "Lync/SfB client not found!");
                 Console.WriteLine("Lync/SfB client not found: '{0}'", ex.Message);
             }
+            catch (System.Runtime.InteropServices.MarshalDirectiveException ex)
+            {
+                Console.WriteLine("Unable to read Lync/SfB state: '{0}'", ex.Message);
+            }
 
         }
 
         private void Contact_ContactInformationChanged(object sender, ContactInformationChangedEventArgs e)
         {
             //Set LED matching Lync/SfB state
+            Console.WriteLine("Lync/SfB state changed!");
             ContactAvailability myAvailability = (ContactAvailability)lyncClient.Self.Contact.GetContactInformation(ContactInformationType.Availability);
-            controlBusylight(myAvailability.ToString());
+            controlBusylight(string.Format("kSetLed,{0};", myAvailability.ToString()));
+        }
+
+        private void ConversationManager_ConversationAdded(object sender, ConversationManagerEventArgs e)
+        {
+            //Alert incoming call
+            if (e.Conversation != null)
+            {
+                    if(e.Conversation.Modalities.ContainsKey(ModalityTypes.AudioVideo) &&
+                        e.Conversation.Modalities[ModalityTypes.AudioVideo].State != ModalityState.Disconnected)
+                    {
+                        //Incoming call
+                        Console.WriteLine("Incoming call!");
+                        controlBusylight("1,kRing;");
+                    }
+            }
         }
 
         private void createConnection()
@@ -122,6 +146,7 @@ namespace ArduinoBusylight
         private void controlBusylight(string command)
         {
             //Control LED behavior
+            Console.WriteLine("About to execute LED command: {0}", command);
             try
             {
                 mySerialPort.Open();
